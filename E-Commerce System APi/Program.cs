@@ -1,11 +1,27 @@
 
+using E_Commerce_System_APi.Repositires;
+using Microsoft.EntityFrameworkCore;
+using System;
+
 namespace E_Commerce_System_APi
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseSqlServer("Data Source=(local); Initial Catalog=Order Management System; Integrated Security=true; TrustServerCertificate=True");
+
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+               options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
             // Add services to the container.
 
