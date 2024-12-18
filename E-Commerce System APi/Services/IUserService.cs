@@ -7,6 +7,6 @@ namespace E_Commerce_System_APi.Services
     {
         string Login(LoginDto model);
         User Register(RegisterDto model);
-        User UpdateUser(UpdateUserDto model);
+        User UpdateUser(UpdateUserDto model, int currentUserId);
     }
 }
