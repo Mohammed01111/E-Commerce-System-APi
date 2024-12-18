@@ -5,68 +5,65 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace E_Commerce_System_APi.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
+    [Route("api/[controller]")]
+    public class ProductsController : ControllerBase
     {
-        private readonly IProductRepository _productRepository;
+        private readonly IProductService _productService;
 
-        public ProductController(IProductRepository productRepository)
+        public ProductsController(IProductService productService)
         {
-            _productRepository = productRepository;
+            _productService = productService;
         }
 
-        [HttpPost("add")]
-        public IActionResult AddProduct([FromBody] ProductDto productDto)
+        [HttpPost]
+        public IActionResult CreateProduct([FromBody] ProductDto model)
         {
-            var product = new Product
+            try
             {
-                Name = productDto.Name,
-                Description = productDto.Description,
-                Price = productDto.Price,
-                Stock = productDto.Stock,
-                OverallRating = 0
-            };
-
-            _productRepository.AddProduct(product);
-            _productRepository.save();
-
-            return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+                var product = _productService.AddProduct(model);
+                return Ok(product);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        [HttpPut("update/{id}")]
-        public IActionResult UpdateProduct(int id, [FromBody] ProductDto productDto)
+        [HttpGet("search")]
+        public IActionResult GetProducts([FromQuery] ProductFilterDto filter)
         {
-            var product = _productRepository.GetProductById(id);
-            if (product == null) return NotFound();
-
-            product.Name = productDto.Name;
-            product.Description = productDto.Description;
-            product.Price = productDto.Price;
-            product.Stock = productDto.Stock;
-
-            _productRepository.UpdateProduct(product);
-            _productRepository.Save();
-
-            return NoContent();
+            try
+            {
+                var products = _productService.GetFilteredProducts(
+                    filter.Name, filter.MinPrice, filter.MaxPrice, filter.Page, filter.PageSize);
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetProductById(int id)
+        [HttpPut("{id}")]
+        public IActionResult UpdateProduct(int id, [FromBody] ProductDto model)
         {
-            var product = _productRepository.GetProductById(id);
-            if (product == null) return NotFound();
+            try
+            {
+                // Ensure the product exists before updating
+                var existingProduct = _productService.GetProductById(id);
+                if (existingProduct == null)
+                {
+                    return NotFound($"Product with ID {id} not found.");
+                }
 
-            return Ok(product);
-        }
-
-        [HttpGet]
-        public IActionResult GetProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string name = null, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null)
-        {
-            var products = _productRepository.GetProducts(page, pageSize, name, minPrice, maxPrice);
-            return Ok(products);
+                var updatedProduct = _productService.UpdateProduct(id, model);
+                return Ok(updatedProduct);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
-
-
