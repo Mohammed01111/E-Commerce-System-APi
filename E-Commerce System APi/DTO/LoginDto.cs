@@ -1,4 +1,4 @@
-﻿namespace OrderManagementSystem.DTO
+﻿namespace E_Commerce_System_APi.DTO
 {
     public class LoginDto
     {
