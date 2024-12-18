@@ -1,4 +1,10 @@
-﻿namespace E_Commerce_System_APi.Controllers
+﻿using E_Commerce_System_APi.DTO;
+using E_Commerce_System_APi.Models;
+using E_Commerce_System_APi.Repositires;
+using E_Commerce_System_APi.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace E_Commerce_System_APi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -27,4 +33,4 @@
     }
 }
 
-}
+
