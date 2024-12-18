@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace E_Commerce_System_APi
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<AppDbContext> options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
