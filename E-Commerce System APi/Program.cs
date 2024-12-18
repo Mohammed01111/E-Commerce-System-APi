@@ -1,5 +1,6 @@
 
 using E_Commerce_System_APi.Repositires;
+using E_Commerce_System_APi.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -11,7 +12,7 @@ namespace E_Commerce_System_APi
         {
 
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseSqlServer("Data Source=(local); Initial Catalog=Order Management System; Integrated Security=true; TrustServerCertificate=True");
+            optionsBuilder.UseSqlServer("Data Source=DESKTOP-VFQRVL8\\MSSQLSERVER02; Initial Catalog=E_Commerce_System_APi; Integrated Security=true; TrustServerCertificate=True");
 
             var builder = WebApplication.CreateBuilder(args);
 
