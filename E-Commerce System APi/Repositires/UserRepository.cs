@@ -1,13 +1,15 @@
 ﻿
 
+using E_Commerce_System_APi.Models;
+
 namespace E_Commerce_System_APi.Repositires
 {
     public class UserRepository : IUserRepository
     {
-        private readonly AppDbContext _context; // The database context to interact with the database (e.g., SQL Server)
+        private readonly ApplicationDbContext _context; // The database context to interact with the database (e.g., SQL Server)
 
         // Constructor that initializes the UserRepository with the database context
-        public UserRepository(AppDbContext context)
+        public UserRepository(ApplicationDbContext context)
         {
             _context = context; // Assigning the AppDbContext to the repository for database operations
         }
