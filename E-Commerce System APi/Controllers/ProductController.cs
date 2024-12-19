@@ -38,8 +38,8 @@ namespace E_Commerce_System_APi.Controllers
         {
             try
             {
-                var products = _productService.GetFilteredProducts(
-                    filter.Name, filter.MinPrice, filter.MaxPrice, filter.Page, filter.PageSize);
+               
+                var products = _productService.GetFilteredProducts(filter.Name);
                 return Ok(products);
             }
             catch (Exception ex)

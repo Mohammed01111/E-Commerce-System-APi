@@ -79,10 +79,10 @@ namespace E_Commerce_System_APi.Services
         }
 
       
-        public List<Product> GetFilteredProducts(string name, decimal minPrice, decimal maxPrice, int page, int pageSize)
+        public List<Product> GetFilteredProducts(string name)
         {
            
-            return _productRepo.GetFilteredProducts(name, minPrice, maxPrice, page, pageSize);
+            return _productRepo.GetFilteredProducts(name);
         }
     }
 }

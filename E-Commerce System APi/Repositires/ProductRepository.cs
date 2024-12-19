@@ -57,17 +57,14 @@ namespace E_Commerce_System_APi.Repositires
         }
 
         // Method to retrieve filtered products based on criteria such as name, price range, and pagination
-        public List<Product> GetFilteredProducts(string name, decimal minPrice, decimal maxPrice, int page, int pageSize)
+        public List<Product> GetFilteredProducts(string name)
         {
-            // Query the Products table with filtering and pagination
+           
             return _context.Products
-                .Where(p => (string.IsNullOrEmpty(name) || p.Name.Contains(name)) && // Filter by name if provided
-                            (minPrice == 0 || p.Price >= minPrice) && // Filter by minimum price if provided
-                            (maxPrice == 0 || p.Price <= maxPrice)) // Filter by maximum price if provided
-                .Skip((page - 1) * pageSize) // Apply pagination (skip previous pages)
-                .Take(pageSize) // Limit the number of records returned (pageSize)
-                .ToList(); // Convert the query results to a list and return
+                .Where(p => string.IsNullOrEmpty(name) || p.Name.Contains(name)) 
+                .ToList();
         }
+
     }
 }
 

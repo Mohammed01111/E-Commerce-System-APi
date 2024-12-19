@@ -7,7 +7,7 @@ namespace E_Commerce_System_APi.Repositires
         void AddProduct(Product product);
         List<Product> GetAll();
         Product GetById(int id);
-        List<Product> GetFilteredProducts(string name, decimal minPrice, decimal maxPrice, int page, int pageSize);
+        List<Product> GetFilteredProducts(string name);
         Product GetProductById(int id);
         void UpdateProduct(Product product);
     }
