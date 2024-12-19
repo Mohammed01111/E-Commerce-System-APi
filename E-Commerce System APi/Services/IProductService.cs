@@ -9,5 +9,7 @@ namespace E_Commerce_System_APi.Services
         List<Product> GetFilteredProducts(string name, decimal minPrice, decimal maxPrice, int page, int pageSize);
         Product GetProductById(int id);
         Product UpdateProduct(int id, ProductDto model);
+
+        List<Product> GetProducts();
     }
 }

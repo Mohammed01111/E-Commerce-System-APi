@@ -47,6 +47,23 @@ namespace E_Commerce_System_APi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet]
+        public IActionResult GetAllProducts()
+        {
+            List<Product> products = new List<Product>();
+            try
+            {
+                products = _productService.GetProducts();
+            }
+
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok(products);
+
+        }
 
         [HttpPut("{id}")]
         public IActionResult UpdateProduct(int id, [FromBody] ProductDto model)

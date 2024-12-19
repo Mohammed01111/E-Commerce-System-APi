@@ -52,8 +52,12 @@ namespace E_Commerce_System_APi.Services
 
             return product; 
         }
+        public List<Product> GetProducts()
+        {
+            return _productRepo.GetAll();
+        }
 
-      
+
         public Product UpdateProduct(int id, ProductDto model)
         {
          

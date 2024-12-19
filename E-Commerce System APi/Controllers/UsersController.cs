@@ -30,6 +30,12 @@ namespace E_Commerce_System_APi.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterDto model)
         {
+            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 var user = _userService.Register(model);
