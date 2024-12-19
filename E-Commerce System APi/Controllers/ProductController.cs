@@ -2,10 +2,12 @@
 using E_Commerce_System_APi.Models;
 using E_Commerce_System_APi.Repositires;
 using E_Commerce_System_APi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_Commerce_System_APi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
