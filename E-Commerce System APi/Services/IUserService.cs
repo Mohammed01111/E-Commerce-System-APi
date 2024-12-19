@@ -5,8 +5,7 @@ namespace E_Commerce_System_APi.Services
 {
     public interface IUserService
     {
-        string Login(LoginDto model);
+        User GetUser(string email, string password);
         User Register(RegisterDto model);
-        User UpdateUser(UpdateUserDto model, int currentUserId);
     }
 }

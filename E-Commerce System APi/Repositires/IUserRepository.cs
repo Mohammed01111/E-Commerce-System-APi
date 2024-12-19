@@ -7,6 +7,6 @@ namespace E_Commerce_System_APi.Repositires
         void AddUser(User user);
         User GetByEmail(string email);
         User GetById(int id);
-        void UpdateUser(User user);
+        User GetUser(string email, string password);
     }
 }

@@ -9,22 +9,25 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
+
 namespace E_Commerce_System_APi.Controllers
 {
-    [ApiController]
-    [Route("Api/[controller]")]
-    public class UsersController : ControllerBase
+    [ApiController] 
+    [Route("api/[Controller]")] 
+    public class UserController : ControllerBase
     {
+        
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
 
-        public UsersController(IUserService userService, IConfiguration configuration)
+       
+        public UserController(IUserService userService, IConfiguration configuration)
         {
             _userService = userService;
             _configuration = configuration;
         }
 
-        [HttpPost("Register")]
+        [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterDto model)
         {
             try
@@ -38,99 +41,54 @@ namespace E_Commerce_System_APi.Controllers
             }
         }
 
-        [HttpPost("Login")]
-        public IActionResult Login([FromBody] LoginDto model)
+        [HttpGet("Login")] 
+        public IActionResult login(string email, string password) 
         {
-            try
-            {
-                // Delegate the login logic to the service
-                var token = _userService.Login(model);
+         
+            var user = _userService.GetUser(email, password);
 
-                // Return the token and user ID as part of the response
-                var user = _userService.GetByEmail(model.Email);
-                if (user == null)
-                {
-                    return Unauthorized(new { message = "Invalid credentials" });
-                }
-
-                return Ok(new
-                {
-                    Token = token,
-                    UserId = user.UID // Use the UID from the user object
-                });
-            }
-            catch (UnauthorizedAccessException ex)
+            if (user != null) 
             {
-                return Unauthorized(new { message = ex.Message });
+             
+                string token = GenerateJwtToken(user.UID.ToString(), user.Name);
+                return Ok(token); 
             }
-            catch (ArgumentException ex)
+            else
             {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (optional)
-                return StatusCode(500, new { message = "An unexpected error occurred." });
+             
+                return BadRequest("Invalid Credentials");
             }
         }
 
-        // The UpdateUser action is now protected by [Authorize]
-        [HttpPut("update")]
-        [Authorize]
-        public IActionResult UpdateUser([FromBody] UpdateUserDto model)
-        {
-            try
-            {
-                // Parse the user ID from claims, ensuring correct type
-                if (!int.TryParse(GetCurrentUserId(), out int currentUserId))
-                {
-                    return Unauthorized("Invalid User ID in token.");
-                }
-
-                // Pass the current user ID to the service
-                var updatedUser = _userService.UpdateUser(model, currentUserId);
-                return Ok(updatedUser);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
+      
         [NonAction]
         public string GenerateJwtToken(string userId, string username)
         {
+          
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["SecretKey"];
+            var secretKey = jwtSettings["SecretKey"]; 
 
+  
             var claims = new[]
             {
             new Claim(JwtRegisteredClaimNames.Sub, userId),
-            new Claim(JwtRegisteredClaimNames.UniqueName, username),
+            new Claim(JwtRegisteredClaimNames.UniqueName, username), 
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
+            
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); 
 
+           
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["ExpiryInMinutes"])),
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["ExpiryInMinutes"])), 
                 signingCredentials: creds
             );
 
+           
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        // Helper method to extract user ID from the token claims
-        private string GetCurrentUserId()
-        {
-            var userIdClaim = User?.Claims?.FirstOrDefault(c =>
-                c.Type == ClaimTypes.NameIdentifier ||
-                c.Type == "sub" ||
-                c.Type == "userId");
-
-            return userIdClaim?.Value;
         }
     }
 }

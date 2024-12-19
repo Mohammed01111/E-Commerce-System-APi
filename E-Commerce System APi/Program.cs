@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Text;
 
@@ -22,19 +23,33 @@ namespace E_Commerce_System_APi
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add JWT Authentication
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = false, // You might want to set this to true in production
-                        ValidateAudience = false, // You might want to set this to true in production
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
-                    };
+                    Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer <token>')",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
                 });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+            });
+
 
 
             // Registering application services with DI container
@@ -47,49 +62,50 @@ namespace E_Commerce_System_APi
             builder.Services.AddScoped<IReviewService, ReviewService>();
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
-            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-            builder.Services.AddLogging();
-
-            // Add controllers and configure JSON serialization options
-            builder.Services.AddControllers()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-                });
-
-            // Add Swagger for API documentation
+            builder.Services.AddControllers();
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // Add Authorization before app.Build()
-            builder.Services.AddAuthorization();
+            // Add JWT Authentication
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+            var secretKey = jwtSettings["SecretKey"];
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false, // You can set this to true if you want to validate the issuer.
+                    ValidateAudience = false, // You can set this to true if you want to validate the audience.
+                    ValidateLifetime = true, // Ensures the token hasn't expired.
+                    ValidateIssuerSigningKey = true, // Ensures the token is properly signed.
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) // Match with your token generation key.
+                };
+            });
 
             var app = builder.Build();
 
-
-            
-
-
-
-            // Configure the HTTP request pipeline
+            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            // Middleware for HTTP requests
             app.UseHttpsRedirection();
-            app.UseAuthentication();
-            app.UseAuthorization();// Ensure authorization middleware is added
 
-            // Map controllers (routes)
+            app.UseAuthentication(); //jwt check middleware
+            app.UseAuthorization();
+
+
             app.MapControllers();
 
-            // Run the app
             app.Run();
         }
-
-        
     }
 }
